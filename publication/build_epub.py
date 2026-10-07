@@ -9,7 +9,7 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 from datetime import datetime, timezone
 import html
-import re
+import json
 import shutil
 import uuid
 import zipfile
@@ -19,82 +19,11 @@ DATA = ROOT / "data"
 OUT = ROOT / "public" / "downloads" / "beyond-the-blackwall.epub"
 BUILD = ROOT / ".epub-build"
 
-FIELDS = [
-    "id", "kind", "chapter", "eyebrow", "title", "body",
-    "kicker", "scene", "plateQuote", "plateCredit"
-]
-
-
-def field(obj: str, key: str):
-    quoted = re.search(rf'\b{re.escape(key)}:\s*"([^"]*)"', obj)
-    if quoted:
-        return quoted.group(1)
-    template = re.search(rf'\b{re.escape(key)}:\s*`([\s\S]*?)`', obj)
-    if template:
-        return template.group(1)
-    return None
-
-
-def parse_objects(source: str):
-    array_start = source.find("[", source.find("BookPage[]"))
-    array_end = source.rfind("]")
-    if array_start < 0 or array_end < 0:
-        return []
-
-    data = source[array_start + 1:array_end]
-    objects = []
-    level = 0
-    start = None
-    in_template = False
-    in_quote = False
-    escaped = False
-
-    for index, char in enumerate(data):
-        if escaped:
-            escaped = False
-            continue
-        if char == "\\":
-            escaped = True
-            continue
-        if char == "`" and not in_quote:
-            in_template = not in_template
-            continue
-        if char == '"' and not in_template:
-            in_quote = not in_quote
-            continue
-        if in_template or in_quote:
-            continue
-        if char == "{":
-            if level == 0:
-                start = index
-            level += 1
-        elif char == "}":
-            level -= 1
-            if level == 0 and start is not None:
-                objects.append(data[start:index + 1])
-                start = None
-
-    pages = []
-    for obj in objects:
-        page = {key: field(obj, key) for key in FIELDS}
-        if page["id"]:
-            pages.append(page)
-    return pages
+BOOK = ROOT / "content" / "book.json"
 
 
 def load_pages():
-    files = [
-        DATA / "cover.ts",
-        DATA / "chapter-01.ts",
-        DATA / "chapter-02.ts",
-        DATA / "chapter-03a.ts",
-        DATA / "chapter-03b.ts",
-        DATA / "chapter-04-teaser.ts",
-    ]
-    pages = []
-    for path in files:
-        pages.extend(parse_objects(path.read_text(encoding="utf-8")))
-    return pages
+    return json.loads(BOOK.read_text(encoding="utf-8"))["pages"]
 
 
 def write_svg(path: Path, title: str, subtitle: str, scene: str):
