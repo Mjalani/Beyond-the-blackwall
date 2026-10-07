@@ -341,7 +341,10 @@ export default function Home() {
           <span className="brand-mark">BW//2077</span>
           <strong>Beyond the Blackwall</strong>
         </div>
-        <button className="text-button" onClick={() => setTocOpen(true)}>Contents</button>
+        <div className="top-actions">
+          <a className="epub-link" href="./downloads/beyond-the-blackwall.epub" download>Download EPUB</a>
+          <button className="text-button" onClick={() => setTocOpen(true)}>Contents</button>
+        </div>
       </header>
 
       <section className="reader" aria-label="Interactive illustrated book reader">
