@@ -170,7 +170,8 @@ blockquote{font-style:italic;margin:1.5em 1em}"""
 
         for page in groups[chapter]:
             if page.get("kind") == "plate":
-                scene_value = page.get("scene")\n                scene = scene_value if scene_value in plate_info else "blackwall"
+                scene_value = page.get("scene")
+                scene = scene_value if scene_value in plate_info else "blackwall"
                 alt = page.get("title") or scene
                 credit = page.get("plateCredit") or "Illustrated scene"
                 content.append(
