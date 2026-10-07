@@ -1,0 +1,9 @@
+{
+  "title": "Beyond the Blackwall",
+  "series": "The Blackwall Chronicles",
+  "language": "en",
+  "status": "serial-in-development",
+  "primaryEbookFormat": "EPUB 3 reflowable",
+  "collectorFormats": ["interactive web", "fixed-layout EPUB", "PDF"],
+  "author": "MJ Alani"
+}
