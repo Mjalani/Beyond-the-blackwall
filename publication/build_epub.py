@@ -169,23 +169,23 @@ blockquote{font-style:italic;margin:1.5em 1em}"""
         content = [f"<h1>{html.escape(chapter.replace(' · ', ' — '))}</h1>"]
 
         for page in groups[chapter]:
-            if page["kind"] == "plate":
-                scene = page["scene"] if page["scene"] in plate_info else "blackwall"
-                alt = page["title"] or scene
-                credit = page["plateCredit"] or "Illustrated scene"
+            if page.get("kind") == "plate":
+                scene_value = page.get("scene")\n                scene = scene_value if scene_value in plate_info else "blackwall"
+                alt = page.get("title") or scene
+                credit = page.get("plateCredit") or "Illustrated scene"
                 content.append(
                     f'<figure class="plate"><img src="images/{scene}.svg" alt="{html.escape(alt)}"/>'
                     f'<figcaption>{html.escape(credit)}</figcaption></figure>'
                 )
-                if page["plateQuote"]:
+                if page.get("plateQuote"):
                     content.append(f"<blockquote>{html.escape(page['plateQuote'])}</blockquote>")
                 continue
 
-            if page["eyebrow"]:
+            if page.get("eyebrow"):
                 content.append(f'<p class="chapter-kicker">{html.escape(page["eyebrow"])}</p>')
-            if page["title"]:
+            if page.get("title"):
                 content.append(f"<h2>{html.escape(page['title'])}</h2>")
-            for paragraph in (page["body"] or "").split("\n\n"):
+            for paragraph in (page.get("body") or "").split("\n\n"):
                 paragraph = paragraph.strip()
                 if not paragraph:
                     continue
@@ -193,7 +193,7 @@ blockquote{font-style:italic;margin:1.5em 1em}"""
                     content.append(f'<div class="transmission">{html.escape(paragraph.lstrip("> "))}</div>')
                 else:
                     content.append(f"<p>{html.escape(paragraph)}</p>")
-            if page["kicker"]:
+            if page.get("kicker"):
                 content.append(f'<p class="divider">{html.escape(page["kicker"])}</p>')
 
         doc = f"""<?xml version="1.0" encoding="utf-8"?>
