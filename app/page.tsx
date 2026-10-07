@@ -73,7 +73,7 @@ function IllustrationPage({ page, pageIndex, face = false }: { page: BookPage; p
         <span />
         <span />
       </div>
-      <div className="art-city" aria-hidden="true">
+      <div className="city-silhouette" aria-hidden="true">
         {buildings.map((height, i) => (
           <i key={i} style={{ "--h": `${height}%`, "--delay": `${(i % 5) * 0.25}s` } as CSSProperties} />
         ))}
@@ -315,17 +315,29 @@ export default function Home() {
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const interactive = target?.closest("button, a, input, textarea, select, [contenteditable='true']");
+      if (event.key === "Escape") {
+        setTocOpen(false);
+        return;
+      }
+      if (event.key.toLowerCase() === "t" && !interactive) {
+        setTocOpen((value) => !value);
+        return;
+      }
+      if (tocOpen || interactive) return;
       if (event.key === "ArrowRight" || event.key === " ") {
         event.preventDefault();
         next();
       }
-      if (event.key === "ArrowLeft") prev();
-      if (event.key.toLowerCase() === "t") setTocOpen((value) => !value);
-      if (event.key === "Escape") setTocOpen(false);
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        prev();
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [index, turning]);
+  }, [index, turning, tocOpen]);
 
   const displayIndex = turning?.direction === "next" ? turning.to : index;
   const leftIndex = turning?.direction === "prev" ? turning.to : index;
@@ -379,8 +391,11 @@ export default function Home() {
 
           {turning?.direction === "prev" && (
             <div className="turn-sheet turn-prev" onAnimationEnd={finishTurn}>
-              <div className="turn-face turn-front">
+              <div className="turn-face turn-front desktop-prev-front">
                 <IllustrationPage page={pages[turning.from]} pageIndex={turning.from} face />
+              </div>
+              <div className="turn-face turn-front mobile-prev-front">
+                <RightPage page={pages[turning.from]} pageIndex={turning.from} face />
               </div>
               <div className="turn-face turn-back">
                 <RightPage page={pages[turning.to]} pageIndex={turning.to} face />
